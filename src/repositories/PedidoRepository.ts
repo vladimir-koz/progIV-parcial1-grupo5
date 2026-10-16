@@ -63,4 +63,7 @@ export class SqlitePedidoRepository {
             items
         };
     }
+    findAll(): Pedido[] {
+        throw new Error('Listado pendiente de implementar');
+    }
 }
