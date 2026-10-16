@@ -23,6 +23,6 @@ export class Expreso extends Producto {
     }
 
     calcularPrecio(): number {
-        throw new Error('Precio pendiente de implementar');
+        return this.precioBase + 18 * this.variedad.precioPorGramo;
     }
 }
