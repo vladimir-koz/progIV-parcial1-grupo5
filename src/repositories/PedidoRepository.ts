@@ -63,10 +63,16 @@ export class SqlitePedidoRepository {
             items
         };
     }
-    findAll(): Pedido[] {
-        const filas = this.db
-            .prepare('SELECT id, mesa, estado FROM pedidos ORDER BY id')
-            .all() as FilaPedido[];
+    findAll(mesa?: number): Pedido[] {
+        const filas = (
+            mesa === undefined
+                ? this.db
+                    .prepare('SELECT id, mesa, estado FROM pedidos ORDER BY id')
+                    .all()
+                : this.db
+                    .prepare('SELECT id, mesa, estado FROM pedidos WHERE mesa = ? ORDER BY id')
+                    .all(mesa)
+        ) as FilaPedido[];
 
         const buscarItems = this.db.prepare(
             'SELECT productoId, cantidad FROM pedido_items WHERE pedidoId = ? ORDER BY rowid'

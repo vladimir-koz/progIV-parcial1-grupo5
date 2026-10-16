@@ -71,4 +71,31 @@ describe('SqlitePedidoRepository', () => {
                 rmSync(carpeta, { recursive: true, force: true });
             }
     });
+    it('devuelve todos los pedidos de una mesa y excluye los demas', () => {
+        const db = createDb(':memory:');
+
+        try {
+            const repositorio = new SqlitePedidoRepository(db);
+            const primero = repositorio.create({
+                mesa: 7,
+                items: [{ productoId: 19, cantidad: 1 }]
+            });
+            repositorio.create({
+                mesa: 4,
+                items: [{ productoId: 19, cantidad: 1 }]
+            });
+            const segundo = repositorio.create({
+                mesa: 7,
+                items: [{ productoId: 19, cantidad: 1 }]
+            });
+            repositorio.create({
+                items: [{ productoId: 19, cantidad: 1 }]
+            });
+
+            expect(repositorio.findAll(7).map((pedido) => pedido.id))
+                .toEqual([primero.id, segundo.id]);
+        } finally {
+            db.close();
+        }
+    });
 });
