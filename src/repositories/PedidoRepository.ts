@@ -64,6 +64,19 @@ export class SqlitePedidoRepository {
         };
     }
     findAll(): Pedido[] {
-        throw new Error('Listado pendiente de implementar');
+        const filas = this.db
+            .prepare('SELECT id, mesa, estado FROM pedidos ORDER BY id')
+            .all() as FilaPedido[];
+
+        const buscarItems = this.db.prepare(
+            'SELECT productoId, cantidad FROM pedido_items WHERE pedidoId = ? ORDER BY rowid'
+        );
+
+        return filas.map((fila) => ({
+            id: fila.id,
+            mesa: fila.mesa,
+            estado: fila.estado,
+            items: buscarItems.all(fila.id) as ItemPedido[]
+        }));
     }
 }
