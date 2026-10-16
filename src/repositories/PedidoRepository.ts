@@ -1,14 +1,66 @@
 import type Database from 'better-sqlite3';
-import type { NuevoPedido, Pedido } from '../models/Pedido';
+import type {
+    EstadoPedido,
+    ItemPedido,
+    NuevoPedido,
+    Pedido
+} from '../models/Pedido';
+
+interface FilaPedido {
+    id: number;
+    mesa: number | null;
+    estado: EstadoPedido;
+}
 
 export class SqlitePedidoRepository {
     constructor(private readonly db: Database.Database) {}
 
-    create(_nuevo: NuevoPedido): Pedido {
-        throw new Error('Repositorio pendiente de implementar');
+    create(nuevo: NuevoPedido): Pedido {
+        const insertarPedido = this.db.prepare(
+            'INSERT INTO pedidos (mesa) VALUES (?)'
+        );
+        const insertarItem = this.db.prepare(
+            'INSERT INTO pedido_items (pedidoId, productoId, cantidad) VALUES (?, ?, ?)'
+        );
+
+        const id = this.db.transaction(() => {
+            const resultado = insertarPedido.run(nuevo.mesa ?? null);
+            const pedidoId = Number(resultado.lastInsertRowid);
+
+            for (const item of nuevo.items) {
+                insertarItem.run(pedidoId, item.productoId, item.cantidad);
+            }
+
+            return pedidoId;
+        })();
+
+        const creado = this.findById(id);
+        if (creado === undefined) {
+            throw new Error('No se pudo recuperar el pedido creado');
+        }
+        return creado;
     }
 
-    findById(_id: number): Pedido | undefined {
-        throw new Error('Repositorio pendiente de implementar');
+    findById(id: number): Pedido | undefined {
+        const fila = this.db
+        .prepare('SELECT id, mesa, estado FROM pedidos WHERE id = ?')
+        .get(id) as FilaPedido | undefined;
+
+        if (fila === undefined) {
+            return undefined;
+        }
+
+        const items = this.db
+        .prepare(
+            'SELECT productoId, cantidad FROM pedido_items WHERE pedidoId = ? ORDER BY rowid'
+        )
+        .all(id) as ItemPedido[];
+
+        return {
+            id: fila.id,
+            mesa: fila.mesa,
+            estado: fila.estado,
+            items
+        };
     }
 }

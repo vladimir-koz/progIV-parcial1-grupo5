@@ -22,6 +22,18 @@ export function createDb(path: string = ':memory:'): Database.Database{
             tamano TEXT,
             variedadId INTEGER REFERENCES variedades(id)
         );
+        CREATE TABLE IF NOT EXISTS pedidos (
+            id INTEGER PRIMARY KEY,
+            mesa INTEGER CHECK (mesa IS NULL OR mesa > 0),
+            estado TEXT NOT NULL DEFAULT 'pendiente'
+                CHECK (estado IN ('pendiente', 'en_preparacion', 'entregado'))
+            );
+
+        CREATE TABLE IF NOT EXISTS pedido_items (
+            pedidoId INTEGER NOT NULL REFERENCES pedidos(id) ON DELETE CASCADE,
+            productoId INTEGER NOT NULL REFERENCES productos(id),
+            cantidad INTEGER NOT NULL CHECK (cantidad > 0)
+        );
     `);
     const yaHayProductos=db.prepare('SELECT 1 FROM productos LIMIT 1').get();
 
