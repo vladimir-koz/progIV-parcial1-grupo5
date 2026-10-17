@@ -53,3 +53,20 @@ describe('GET /reportes/mas-vendido', () => {
         expect(respuesta.body).toEqual({ error: 'SinVentas' });
     });
 });
+describe('GET /reportes/cantidades', () => {
+    it('devuelve las cantidades vendidas por tipo', async () => {
+        const servicio: ReporteService = {
+            facturacionTotal: () => 0,
+            cantidadVendidaPorTipo: () => ({ Expreso: 3, Filtrado: 1 }),
+            tipoMasVendido: () => undefined
+        };
+
+        const app = express();
+        app.use('/reportes', makeReportesRouter(servicio));
+
+        const respuesta = await request(app).get('/reportes/cantidades');
+
+        expect(respuesta.status).toBe(200);
+        expect(respuesta.body).toEqual({ Expreso: 3, Filtrado: 1 });
+    });
+});
