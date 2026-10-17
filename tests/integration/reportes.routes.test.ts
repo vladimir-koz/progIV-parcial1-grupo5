@@ -21,3 +21,20 @@ describe('GET /reportes/facturacion', () => {
         expect(respuesta.body).toEqual({ total: 7500 });
     });
 });
+describe('GET /reportes/mas-vendido', () => {
+    it('devuelve el tipo más vendido y su cantidad', async () => {
+        const servicio: ReporteService = {
+            facturacionTotal: () => 0,
+            cantidadVendidaPorTipo: () => ({}),
+            tipoMasVendido: () => ({ tipo: 'expreso', cantidad: 3 })
+        };
+
+        const app = express();
+        app.use('/reportes', makeReportesRouter(servicio));
+
+        const respuesta = await request(app).get('/reportes/mas-vendido');
+
+        expect(respuesta.status).toBe(200);
+        expect(respuesta.body).toEqual({ tipo: 'expreso', cantidad: 3 });
+    });
+});
