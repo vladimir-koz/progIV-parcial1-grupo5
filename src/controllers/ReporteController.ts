@@ -8,6 +8,13 @@ export class ReporteController {
         res.json({ total: this.servicio.facturacionTotal() });
     };
     masVendido = (_req: Request, res: Response): void => {
-    res.json(this.servicio.tipoMasVendido());
-};
+        const resultado = this.servicio.tipoMasVendido();
+
+        if (resultado === undefined) {
+            res.status(404).json({ error: 'SinVentas' });
+            return;
+        }
+
+        res.json(resultado);
+    };
 }
