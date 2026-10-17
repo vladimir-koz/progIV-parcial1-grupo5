@@ -37,4 +37,17 @@ describe('GET /pedidos', () => {
             db.close();
         }
     });
+    it.each(['0', 'abc'])('rechaza mesa inválida: %s', async (mesa) => {
+        const db = createDb(':memory:');
+
+        try {
+            const respuesta = await request(makeApp(db))
+                .get('/pedidos')
+                .query({ mesa });
+
+            expect(respuesta.status).toBe(400);
+        } finally {
+            db.close();
+        }
+    });
 });
