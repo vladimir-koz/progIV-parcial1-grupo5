@@ -2,6 +2,12 @@ import { Variedad } from "./Variedad";
 
 export type Tamano = 'Pocillo'|'Mediano'|'Taza grande';
 
+const GRAMOS_EXPRESO: Record<Tamano, number> = {
+    'Pocillo': 18,
+    'Mediano': 27,
+    'Taza grande': 36,
+};
+
 export abstract class Producto {
     constructor(
         readonly id: number,
@@ -23,6 +29,6 @@ export class Expreso extends Producto {
     }
 
     calcularPrecio(): number {
-        return this.precioBase + 18 * this.variedad.precioPorGramo;
+        return this.precioBase + GRAMOS_EXPRESO[this.tamano] * this.variedad.precioPorGramo;
     }
 }
