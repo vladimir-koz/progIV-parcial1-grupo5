@@ -18,7 +18,6 @@ export interface TipoMasVendido {
   tipo: TipoProducto;
   cantidad: number;
 }
-
 export interface ReporteService {
   facturacionTotal(): number;
   cantidadVendidaPorTipo(): Record<string, number>;
@@ -32,19 +31,19 @@ const NOMBRES: Record<TipoProducto, string> = {
   pasteleria: 'Pastelería'
 };
 
-// Los reportes reutilizan los servicios de pedidos y productos.
+
 export class ReporteServiceImpl implements ReporteService {
   constructor(
     private readonly pedidos: FuentePedidos,
     private readonly productos: FuenteProductos
   ) {}
 
-  // Suma todos los pedidos registrados, independientemente de su estado.
+
   facturacionTotal(): number {
     return this.pedidos.listarPedidos().reduce((suma, pedido) => suma + pedido.total, 0);
   }
 
-  // Ejemplo: { Expreso: 10, Filtrado: 4, Pastelería: 3 }.
+
   cantidadVendidaPorTipo(): Record<string, number> {
     const cantidades = this.contarPorTipo();
     const resultado: Record<string, number> = {};
@@ -55,7 +54,6 @@ export class ReporteServiceImpl implements ReporteService {
   }
 
 
-  // Ante un empate gana el primer tipo de ORDEN_TIPOS.
   tipoMasVendido(): TipoMasVendido | undefined {
     const cantidades = this.contarPorTipo();
     let ganador: TipoMasVendido | undefined;
@@ -66,7 +64,7 @@ export class ReporteServiceImpl implements ReporteService {
       }
     }
     return ganador;
-  }  
+  }
 
   private contarPorTipo(): Record<TipoProducto, number> {
     const cantidades: Record<TipoProducto, number> = {
