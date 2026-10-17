@@ -1,5 +1,14 @@
 import type { Request, Response } from 'express';
 import { PedidoService } from '../services/PedidoService';
+import { z } from 'zod';
+
+const crearPedidoSchema = z.object({
+    mesa: z.number().int().positive().nullable().optional(),
+    items: z.array(z.object({
+        productoId: z.number().int().positive(),
+        cantidad: z.number().int().positive()
+    })).min(1)
+}).strict();
 
 export class PedidoController {
     constructor(private readonly servicio: PedidoService) {}
@@ -42,5 +51,16 @@ export class PedidoController {
         }
 
         res.json(pedido);
+    };
+    crear = (req: Request, res: Response): void => {
+        const validacion = crearPedidoSchema.safeParse(req.body);
+
+        if (!validacion.success) {
+            res.status(400).json({ error: 'DatosInvalidos' });
+            return;
+        }
+
+        const pedido = this.servicio.crearPedido(validacion.data);
+        res.status(201).json(pedido);
     };
 }

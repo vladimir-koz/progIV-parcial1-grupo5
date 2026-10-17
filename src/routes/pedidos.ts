@@ -8,6 +8,7 @@ export function makePedidosRouter(servicio: PedidoService) {
 
     router.get('/', controlador.listar);
     router.get('/:id', controlador.obtenerPorId);
+    router.post('/', controlador.crear);
 
     return router;
 }

@@ -1,4 +1,4 @@
-import type { Pedido } from '../models/Pedido';
+import type { NuevoPedido,Pedido } from '../models/Pedido';
 import { SqlitePedidoRepository } from '../repositories/PedidoRepository';
 
 export class PedidoService {
@@ -10,4 +10,7 @@ export class PedidoService {
     obtenerPedido(id: number): Pedido | undefined {
         return this.pedidos.findById(id);
     }
+    crearPedido(nuevo: NuevoPedido): Pedido {
+    return this.pedidos.create(nuevo);
+}
 }
