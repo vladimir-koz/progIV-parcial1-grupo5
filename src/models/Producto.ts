@@ -32,3 +32,25 @@ export class Expreso extends Producto {
         return this.precioBase + GRAMOS_EXPRESO[this.tamano] * this.variedad.precioPorGramo;
     }
 }
+
+const GRAMOS_FILTRADO: Record<Tamano, number> = {
+    'Pocillo': 6,
+    'Mediano': 15,
+    'Taza grande': 25,
+};
+
+export class Filtrado extends Producto {
+    constructor(
+        id: number,
+        nombre: string,
+        precioBase: number,
+        readonly tamano: Tamano,
+        readonly variedad: Variedad
+    ) {
+        super(id, nombre, precioBase);
+    }
+
+    calcularPrecio(): number {
+        return this.precioBase + GRAMOS_FILTRADO[this.tamano] * this.variedad.precioPorGramo;
+    }
+}
