@@ -26,4 +26,16 @@ export class PedidoController {
 
         res.json(this.servicio.listarPedidos(mesa));
     };
+    obtenerPorId = (req: Request, res: Response): void => {
+        const id = Number(req.params.id);
+        const pedido = this.servicio.obtenerPedido(id);
+
+        if (pedido === undefined) {
+            res.status(404).json({ error: 'NoEncontrado' });
+            return;
+        }
+
+        res.json(pedido);
+    };
+    
 }

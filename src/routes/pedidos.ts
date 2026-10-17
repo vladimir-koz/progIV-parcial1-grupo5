@@ -7,6 +7,7 @@ export function makePedidosRouter(servicio: PedidoService) {
     const controlador = new PedidoController(servicio);
 
     router.get('/', controlador.listar);
+    router.get('/:id', controlador.obtenerPorId);
 
     return router;
 }
