@@ -17,4 +17,7 @@ export class ReporteController {
 
         res.json(resultado);
     };
+    cantidades = (_req: Request, res: Response): void => {
+        res.json(this.servicio.cantidadVendidaPorTipo());
+    };
 }

@@ -8,6 +8,7 @@ export function makeReportesRouter(servicio: ReporteService) {
 
     router.get('/facturacion', controlador.facturacion);
     router.get('/mas-vendido', controlador.masVendido);
+    router.get('/cantidades', controlador.cantidades);
 
     return router;
 }
