@@ -54,3 +54,9 @@ export class Filtrado extends Producto {
         return this.precioBase + GRAMOS_FILTRADO[this.tamano] * this.variedad.precioPorGramo;
     }
 }
+
+export class Pasteleria extends Producto {
+    calcularPrecio(): number {
+        return this.precioBase;
+    }
+}
