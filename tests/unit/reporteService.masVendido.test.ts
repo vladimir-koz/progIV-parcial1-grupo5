@@ -87,3 +87,33 @@ describe('ReporteService - cantidadVendidaPorTipo', () => {
     expect(() => service.cantidadVendidaPorTipo()).toThrow('No existe el producto con id 999');
   });
 });
+
+describe('ReporteService - tipoMasVendido', () => {
+  it('devuelve undefined cuando no hay ventas', () => {
+    expect(serviceCon([]).tipoMasVendido()).toBeUndefined();
+  });
+
+  it('devuelve el tipo con mayor cantidad vendida', () => {
+    const service = serviceCon([
+      pedido(1, [
+        { productoId: 2, cantidad: 3 },
+        { productoId: 14, cantidad: 4 }
+      ]),
+      pedido(2, [{ productoId: 2, cantidad: 7 }])
+    ]);
+
+    expect(service.tipoMasVendido()).toEqual({
+      tipo: 'expreso',
+      cantidad: 10
+    });
+  });
+
+  it('ante un empate usa el orden Expreso, Filtrado, Pastelería', () => {
+    const service = serviceCon([
+      pedido(1, [{ productoId: 19, cantidad: 5 }]),
+      pedido(2, [{ productoId: 14, cantidad: 5 }])
+    ]);
+
+    expect(service.tipoMasVendido()).toEqual({ tipo: 'filtrado', cantidad: 5 });
+  });
+});
