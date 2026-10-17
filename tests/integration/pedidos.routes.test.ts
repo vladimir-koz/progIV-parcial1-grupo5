@@ -133,7 +133,8 @@ describe('POST /pedidos', () => {
                 id: 1,
                 mesa: 7,
                 items: [{ productoId: 19, cantidad: 2 }],
-                estado: 'pendiente'
+                estado: 'pendiente',
+                total:5000
             });
 
             const repositorio = new SqlitePedidoRepository(db);
