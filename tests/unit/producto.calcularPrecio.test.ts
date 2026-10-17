@@ -56,27 +56,32 @@ const casosFiltrado: Caso[] = [
 ];
 
 describe('Expreso.calcularPrecio', () => {
-    it.each(casosExpreso)('%s -> %i', (tamano, variedad, esperado) => {
-        const expreso = new Expreso(1, `Expreso ${tamano} ${variedad.nombre}`, 2500, tamano, variedad);
-        expect(expreso.calcularPrecio()).toBe(esperado);
-    });
+    for (const [tamano, variedad, esperado] of casosExpreso) {
+        it(`${tamano} ${variedad.nombre} cuesta ${esperado}`, () => {
+            const expreso = new Expreso(1, `Expreso ${tamano} ${variedad.nombre}`, 2500, tamano, variedad);
+            expect(expreso.calcularPrecio()).toBe(esperado);
+        });
+    }
 });
 
 describe('Filtrado.calcularPrecio', () => {
-    it.each(casosFiltrado)('%s -> %i', (tamano, variedad, esperado) => {
-        const filtrado = new Filtrado(10, `Filtrado ${tamano} ${variedad.nombre}`, 3200, tamano, variedad);
-        expect(filtrado.calcularPrecio()).toBe(esperado);
-    });
+    for (const [tamano, variedad, esperado] of casosFiltrado) {
+        it(`${tamano} ${variedad.nombre} cuesta ${esperado}`, () => {
+            const filtrado = new Filtrado(10, `Filtrado ${tamano} ${variedad.nombre}`, 3200, tamano, variedad);
+            expect(filtrado.calcularPrecio()).toBe(esperado);
+        });
+    }
 });
+
 
 describe('Pasteleria.calcularPrecio', () => {
     it('muffin de chocolate cuesta 2500', () => {
-        const muffin = new Pasteleria(20, 'Muffin de chocolate', 2500);
+        const muffin = new Pasteleria(19, 'Muffin de chocolate', 2500);
         expect(muffin.calcularPrecio()).toBe(2500);
     });
 
     it('torta selva negra cuesta 4200', () => {
-        const torta = new Pasteleria(21, 'Torta selva negra', 4200);
+        const torta = new Pasteleria(20, 'Torta selva negra', 4200);
         expect(torta.calcularPrecio()).toBe(4200);
     });
 });
@@ -91,6 +96,6 @@ describe('tipo de producto', () => {
     });
 
     it('Pasteleria se identifica como pasteleria', () => {
-        expect(new Pasteleria(20, 'Muffin', 2500).tipo).toBe('pasteleria');
+        expect(new Pasteleria(19, 'Muffin', 2500).tipo).toBe('pasteleria');
     });
 });
