@@ -7,4 +7,7 @@ export class ReporteController {
     facturacion = (_req: Request, res: Response): void => {
         res.json({ total: this.servicio.facturacionTotal() });
     };
+    masVendido = (_req: Request, res: Response): void => {
+    res.json(this.servicio.tipoMasVendido());
+};
 }
