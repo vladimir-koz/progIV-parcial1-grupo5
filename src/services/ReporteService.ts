@@ -14,9 +14,15 @@ export interface FuenteProductos {
   obtenerProducto(id: number): { tipo: TipoProducto } | undefined;
 }
 
+export interface TipoMasVendido {
+  tipo: TipoProducto;
+  cantidad: number;
+}
+
 export interface ReporteService {
   facturacionTotal(): number;
   cantidadVendidaPorTipo(): Record<string, number>;
+  tipoMasVendido(): TipoMasVendido | undefined;
 }
 
 const ORDEN_TIPOS: TipoProducto[] = ['expreso', 'filtrado', 'pasteleria'];
@@ -47,6 +53,20 @@ export class ReporteServiceImpl implements ReporteService {
     }
     return resultado;
   }
+
+
+  // Ante un empate gana el primer tipo de ORDEN_TIPOS.
+  tipoMasVendido(): TipoMasVendido | undefined {
+    const cantidades = this.contarPorTipo();
+    let ganador: TipoMasVendido | undefined;
+    for (const tipo of ORDEN_TIPOS) {
+      const cantidad = cantidades[tipo];
+      if (cantidad > 0 && (!ganador || cantidad > ganador.cantidad)) {
+        ganador = { tipo, cantidad };
+      }
+    }
+    return ganador;
+  }  
 
   private contarPorTipo(): Record<TipoProducto, number> {
     const cantidades: Record<TipoProducto, number> = {
