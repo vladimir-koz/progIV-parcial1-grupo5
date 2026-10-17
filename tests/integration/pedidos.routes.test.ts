@@ -51,3 +51,24 @@ describe('GET /pedidos', () => {
         }
     });
 });
+describe('GET /pedidos/:id', () => {
+    it('devuelve el pedido solicitado por su ID', async () => {
+        const db = createDb(':memory:');
+
+        try {
+            const repositorio = new SqlitePedidoRepository(db);
+            const creado = repositorio.create({
+                mesa: 7,
+                items: [{ productoId: 19, cantidad: 2 }]
+            });
+
+            const respuesta = await request(makeApp(db))
+                .get(`/pedidos/${creado.id}`);
+
+            expect(respuesta.status).toBe(200);
+            expect(respuesta.body).toMatchObject(creado);
+        } finally {
+            db.close();
+        }
+    });
+});
