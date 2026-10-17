@@ -116,3 +116,48 @@ describe('GET /pedidos/:id', () => {
         }
     });
 });
+describe('POST /pedidos', () => {
+    it('crea y guarda un pedido pendiente con mesa', async () => {
+        const db = createDb(':memory:');
+
+        try {
+            const respuesta = await request(makeApp(db))
+                .post('/pedidos')
+                .send({
+                    mesa: 7,
+                    items: [{ productoId: 19, cantidad: 2 }]
+                });
+
+            expect(respuesta.status).toBe(201);
+            expect(respuesta.body).toMatchObject({
+                id: 1,
+                mesa: 7,
+                items: [{ productoId: 19, cantidad: 2 }],
+                estado: 'pendiente'
+            });
+
+            const repositorio = new SqlitePedidoRepository(db);
+            expect(repositorio.findById(1)).toMatchObject({
+                mesa: 7,
+                items: [{ productoId: 19, cantidad: 2 }],
+                estado: 'pendiente'
+            });
+        } finally {
+            db.close();
+        }
+    });
+    it('rechaza un pedido sin ítems y no guarda nada', async () => {
+        const db = createDb(':memory:');
+
+        try {
+            const respuesta = await request(makeApp(db))
+                .post('/pedidos')
+                .send({ mesa: 7, items: [] });
+
+            expect(respuesta.status).toBe(400);
+            expect(new SqlitePedidoRepository(db).findAll()).toEqual([]);
+        } finally {
+            db.close();
+        }
+    });
+});
