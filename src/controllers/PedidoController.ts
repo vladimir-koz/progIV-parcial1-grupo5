@@ -37,5 +37,4 @@ export class PedidoController {
 
         res.json(pedido);
     };
-    
 }
