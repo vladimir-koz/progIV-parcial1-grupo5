@@ -71,4 +71,16 @@ describe('GET /pedidos/:id', () => {
             db.close();
         }
     });
+    it.each(['0', 'abc'])('rechaza el ID inválido: %s', async (id) => {
+        const db = createDb(':memory:');
+
+        try {
+            const respuesta = await request(makeApp(db))
+                .get(`/pedidos/${id}`);
+
+            expect(respuesta.status).toBe(400);
+        } finally {
+            db.close();
+        }
+    });
 });
