@@ -1,3 +1,4 @@
+import { ProductoRepository } from '../repositories/ProductoRepository';
 import { Producto } from '../models/Producto';
 
 export interface ProductoService {
@@ -6,13 +7,13 @@ export interface ProductoService {
 }
 
 export class ProductoServiceImpl implements ProductoService {
-  constructor() {}
+  constructor(private readonly repo: ProductoRepository) {}
 
   listarProductos(): Producto[] {
-    return []
+    return this.repo.findAll();
   }
 
   obtenerProducto(id: number): Producto | undefined {
-    return undefined;
+    return this.repo.findById(id);
   }
 }
