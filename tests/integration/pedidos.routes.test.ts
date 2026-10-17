@@ -50,6 +50,27 @@ describe('GET /pedidos', () => {
             db.close();
         }
     });
+    it('lista todos los pedidos cuando no se indica mesa', async () => {
+        const db = createDb(':memory:');
+
+        try {
+            const repositorio = new SqlitePedidoRepository(db);
+            const primero = repositorio.create({
+                mesa: 7,
+                items: [{ productoId: 19, cantidad: 1 }]
+            });
+            const segundo = repositorio.create({
+                items: [{ productoId: 19, cantidad: 2 }]
+            });
+
+            const respuesta = await request(makeApp(db)).get('/pedidos');
+
+            expect(respuesta.status).toBe(200);
+            expect(respuesta.body).toMatchObject([primero, segundo]);
+        } finally {
+            db.close();
+        }
+    });
 });
 describe('GET /pedidos/:id', () => {
     it('devuelve el pedido solicitado por su ID', async () => {
@@ -79,6 +100,17 @@ describe('GET /pedidos/:id', () => {
                 .get(`/pedidos/${id}`);
 
             expect(respuesta.status).toBe(400);
+        } finally {
+            db.close();
+        }
+    });
+    it('responde 404 si el ID válido no existe', async () => {
+        const db = createDb(':memory:');
+
+        try {
+            const respuesta = await request(makeApp(db)).get('/pedidos/999');
+
+            expect(respuesta.status).toBe(404);
         } finally {
             db.close();
         }
