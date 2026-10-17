@@ -16,7 +16,15 @@ export interface FuenteProductos {
 
 export interface ReporteService {
   facturacionTotal(): number;
+  cantidadVendidaPorTipo(): Record<string, number>;
 }
+
+const ORDEN_TIPOS: TipoProducto[] = ['expreso', 'filtrado', 'pasteleria'];
+const NOMBRES: Record<TipoProducto, string> = {
+  expreso: 'Expreso',
+  filtrado: 'Filtrado',
+  pasteleria: 'Pastelería'
+};
 
 // Los reportes reutilizan los servicios de pedidos y productos.
 export class ReporteServiceImpl implements ReporteService {
@@ -28,5 +36,35 @@ export class ReporteServiceImpl implements ReporteService {
   // Suma todos los pedidos registrados, independientemente de su estado.
   facturacionTotal(): number {
     return this.pedidos.listarPedidos().reduce((suma, pedido) => suma + pedido.total, 0);
+  }
+
+  // Ejemplo: { Expreso: 10, Filtrado: 4, Pastelería: 3 }.
+  cantidadVendidaPorTipo(): Record<string, number> {
+    const cantidades = this.contarPorTipo();
+    const resultado: Record<string, number> = {};
+    for (const tipo of ORDEN_TIPOS) {
+      if (cantidades[tipo] > 0) resultado[NOMBRES[tipo]] = cantidades[tipo];
+    }
+    return resultado;
+  }
+
+  private contarPorTipo(): Record<TipoProducto, number> {
+    const cantidades: Record<TipoProducto, number> = {
+      expreso: 0,
+      filtrado: 0,
+      pasteleria: 0
+    };
+
+    for (const pedido of this.pedidos.listarPedidos()) {
+      for (const item of pedido.items) {
+        const producto = this.productos.obtenerProducto(item.productoId);
+        if (!producto) {
+          throw new Error('No existe el producto con id ' + item.productoId);
+        }
+        cantidades[producto.tipo] += item.cantidad;
+      }
+    }
+
+    return cantidades;
   }
 }
