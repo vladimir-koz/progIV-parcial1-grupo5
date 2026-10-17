@@ -28,6 +28,12 @@ export class PedidoController {
     };
     obtenerPorId = (req: Request, res: Response): void => {
         const id = Number(req.params.id);
+
+        if (!Number.isSafeInteger(id) || id <= 0) {
+            res.status(400).json({ error: 'DatosInvalidos' });
+            return;
+        }
+
         const pedido = this.servicio.obtenerPedido(id);
 
         if (pedido === undefined) {
