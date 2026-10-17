@@ -1,12 +1,13 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import request from 'supertest';
 import { makeApp } from '../../src/app';
+import { createDb } from '../../src/db/connection';
 
 describe('GET /productos', () => {
   let app: ReturnType<typeof makeApp>;
 
   beforeEach(() => {
-    app = makeApp(':memory:');
+    app = makeApp( createDb(':memory:') );
   });
 
   it('responde 200 con los 20 productos del catálogo', async () => {
@@ -36,7 +37,7 @@ describe('GET /productos/:id', () => {
   let app: ReturnType<typeof makeApp>;
 
   beforeEach(() => {
-    app = makeApp(':memory:');
+    app = makeApp( createDb(':memory:') );
   });
 
   it('responde 200 con un café, su variedad y su precio final', async () => {

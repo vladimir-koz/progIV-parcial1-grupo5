@@ -1,70 +1,71 @@
-import { Variedad } from "./Variedad";
+import { Variedad } from './Variedad';
 
-export type Tamano = 'Pocillo' | 'Mediano' | 'Taza grande';
 export type TipoProducto = 'expreso' | 'filtrado' | 'pasteleria';
-
-const GRAMOS_EXPRESO: Record<Tamano, number> = {
-    'Pocillo': 18,
-    'Mediano': 27,
-    'Taza grande': 36,
-};
-
-const GRAMOS_FILTRADO: Record<Tamano, number> = {
-    'Pocillo': 6,
-    'Mediano': 15,
-    'Taza grande': 25,
-};
+export type Tamano = 'Pocillo' | 'Mediano' | 'Taza grande';
 
 export abstract class Producto {
-    abstract readonly tipo: TipoProducto;
+  abstract readonly tipo: TipoProducto;
 
-    constructor(
-        readonly id: number,
-        readonly nombre: string,
-        readonly precioBase: number
-    ) {}
+  constructor(
+    readonly id: number,
+    readonly nombre: string,
+    readonly precioBase: number
+  ) {}
 
-    abstract calcularPrecio(): number;
+  abstract calcularPrecio(): number;
+
+  toJSON(): Record<string, unknown> {
+    return {
+      id: this.id,
+      tipo: this.tipo,
+      nombre: this.nombre,
+      precioBase: this.precioBase,
+      precio: this.calcularPrecio()
+    };
+  }
 }
 
-abstract class Cafe extends Producto {
-    constructor(
-        id: number,
-        nombre: string,
-        precioBase: number,
-        readonly tamano: Tamano,
-        readonly variedad: Variedad
-    ) {
-        super(id, nombre, precioBase);
-    }
+export abstract class Cafe extends Producto {
+  protected abstract readonly gramosPorTamano: Record<Tamano, number>;
 
-    protected abstract gramos(): number;
+  constructor(
+    id: number,
+    nombre: string,
+    precioBase: number,
+    readonly tamano: Tamano,
+    readonly variedad: Variedad
+  ) {
+    super(id, nombre, precioBase);
+  }
 
-    calcularPrecio(): number {
-        return this.precioBase + this.gramos() * this.variedad.precioPorGramo;
-    }
+  get gramos(): number {
+    return this.gramosPorTamano[this.tamano];
+  }
+
+  calcularPrecio(): number {
+    return this.precioBase + this.gramos * this.variedad.precioPorGramo;
+  }
+
+  toJSON(): Record<string, unknown> {
+    const { precio, ...datos } = super.toJSON();
+    return { ...datos, tamano: this.tamano, gramos: this.gramos, variedad: this.variedad, precio };
+  }
 }
 
 export class Expreso extends Cafe {
-    readonly tipo = 'expreso' as const;
-
-    protected gramos(): number {
-        return GRAMOS_EXPRESO[this.tamano];
-    }
+  readonly tipo = 'expreso';
+  protected readonly gramosPorTamano = { Pocillo: 18, Mediano: 27, 'Taza grande': 36 };
 }
 
 export class Filtrado extends Cafe {
-    readonly tipo = 'filtrado' as const;
-
-    protected gramos(): number {
-        return GRAMOS_FILTRADO[this.tamano];
-    }
+  readonly tipo = 'filtrado';
+  protected readonly gramosPorTamano = { Pocillo: 6, Mediano: 15, 'Taza grande': 25 };
 }
 
 export class Pasteleria extends Producto {
-    readonly tipo = 'pasteleria' as const;
+  readonly tipo = 'pasteleria';
 
-    calcularPrecio(): number {
-        return this.precioBase;
-    }
+  calcularPrecio(): number {
+    return this.precioBase;
+  }
 }
