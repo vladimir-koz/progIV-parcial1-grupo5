@@ -53,7 +53,7 @@ test('un pedido con un producto inexistente se rechaza y no afecta la facturaci√
   const createRes = await request.post('/pedidos', {
     data: { items: [{ productoId: 999, cantidad: 1 }] }
   });
-  console.log({createRes})
+
   expect(createRes.status()).toBe(400);
   expect(await createRes.json()).toEqual({ error: 'ProductoInexistente', productoId: 999 });
 

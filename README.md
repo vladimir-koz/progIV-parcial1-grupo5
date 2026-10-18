@@ -102,10 +102,10 @@ e2e/                        # Flujo completo con Playwright
 | GET | `/pedidos` | 200 — lista de pedidos con su `total` |
 | GET | `/pedidos/:id` | 200 — pedido · 404 `{ error: "NoEncontrado" }` |
 | GET | `/reportes/facturacion` | 200 — `{ total }` |
-| GET | `/reportes/cantidad-vendida` | 200 — `{ "Expreso": 10, "Pastelería": 3 }` |
+| GET | `/reportes/cantidades` | 200 — `{ "Expreso": 10, "Pastelería": 3 }` |
 | GET | `/reportes/mas-vendido` | 200 — `{ tipo, cantidad }` · 404 `{ error: "SinVentas" }` |
 
-`/reportes/cantidad-vendida` no figura en la consigna. Se agregó para poder
+`/reportes/cantidades` no figura en la consigna. Se agregó para poder
 ver el resultado del punto 3, del que sale el tipo más vendido.
 
 **Nuevo pedido:** `{ mesa?, items: [{ productoId, cantidad }] }`
