@@ -319,7 +319,7 @@
           "name": "Cantidad vendida por tipo",
           "request": {
             "method": "GET",
-            "url": { "raw": "{{baseUrl}}/reportes/cantidad-vendida", "host": ["{{baseUrl}}"], "path": ["reportes", "cantidad-vendida"] }
+            "url": { "raw": "{{baseUrl}}/reportes/cantidades", "host": ["{{baseUrl}}"], "path": ["reportes", "cantidades"] }
           },
           "event": [
             {
