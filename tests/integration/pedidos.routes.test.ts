@@ -161,4 +161,18 @@ describe('POST /pedidos', () => {
             db.close();
         }
     });
+    it('rechaza un producto inexistente y no guarda el pedido', async () => {
+        const db = createDb(':memory:');
+
+        try {
+            const respuesta = await request(makeApp(db))
+                .post('/pedidos')
+                .send({ items: [{ productoId: 999, cantidad: 1 }] });
+
+            expect(respuesta.status).toBe(400);
+            expect(new SqlitePedidoRepository(db).findAll()).toEqual([]);
+        } finally {
+            db.close();
+        }
+    });
 });
