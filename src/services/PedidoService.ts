@@ -1,13 +1,47 @@
-import type { Pedido } from '../models/Pedido';
+import type { ItemPedido, NuevoPedido, Pedido } from '../models/Pedido';
 import { SqlitePedidoRepository } from '../repositories/PedidoRepository';
+import type { ProductoService } from './ProductoService';
 
 export class PedidoService {
-    constructor(private readonly pedidos: SqlitePedidoRepository) {}
+    constructor(
+        private readonly pedidos: SqlitePedidoRepository,
+        private readonly productos: ProductoService
+    ) {}
 
-    listarPedidos(mesa?: number): Pedido[] {
-        return this.pedidos.findAll(mesa);
+    listarPedidos(mesa?: number): Array<Pedido & { total: number }> {
+        return this.pedidos.findAll(mesa).map((pedido) => this.agregarTotal(pedido));
     }
-    obtenerPedido(id: number): Pedido | undefined {
-        return this.pedidos.findById(id);
+
+    obtenerPedido(id: number): (Pedido & { total: number }) | undefined {
+        const pedido = this.pedidos.findById(id);
+        return pedido === undefined ? undefined : this.agregarTotal(pedido);
+    }
+
+    crearPedido(nuevo: NuevoPedido): (Pedido & { total: number }) | undefined {
+        const total = this.calcularTotal(nuevo.items);
+        if (total === undefined) return undefined;
+
+        const pedido = this.pedidos.create(nuevo);
+        return { ...pedido, total };
+    }
+
+    private agregarTotal(pedido: Pedido): Pedido & { total: number } {
+        const total = this.calcularTotal(pedido.items);
+        if (total === undefined) {
+            throw new Error('Pedido guardado con producto inexistente');
+        }
+        return { ...pedido, total };
+    }
+
+    private calcularTotal(items: ItemPedido[]): number | undefined {
+        let total = 0;
+
+        for (const item of items) {
+            const producto = this.productos.obtenerProducto(item.productoId);
+            if (producto === undefined) return undefined;
+            total += producto.calcularPrecio() * item.cantidad;
+        }
+
+        return total;
     }
 }

@@ -66,7 +66,10 @@ describe('GET /pedidos', () => {
             const respuesta = await request(makeApp(db)).get('/pedidos');
 
             expect(respuesta.status).toBe(200);
-            expect(respuesta.body).toMatchObject([primero, segundo]);
+            expect(respuesta.body).toMatchObject([
+                { ...primero, total: 2500 },
+                { ...segundo, total: 5000 }
+            ]);
         } finally {
             db.close();
         }
@@ -87,7 +90,7 @@ describe('GET /pedidos/:id', () => {
                 .get(`/pedidos/${creado.id}`);
 
             expect(respuesta.status).toBe(200);
-            expect(respuesta.body).toMatchObject(creado);
+            expect(respuesta.body).toMatchObject({ ...creado, total: 5000 });
         } finally {
             db.close();
         }
@@ -111,6 +114,66 @@ describe('GET /pedidos/:id', () => {
             const respuesta = await request(makeApp(db)).get('/pedidos/999');
 
             expect(respuesta.status).toBe(404);
+        } finally {
+            db.close();
+        }
+    });
+});
+describe('POST /pedidos', () => {
+    it('crea y guarda un pedido pendiente con mesa', async () => {
+        const db = createDb(':memory:');
+
+        try {
+            const respuesta = await request(makeApp(db))
+                .post('/pedidos')
+                .send({
+                    mesa: 7,
+                    items: [{ productoId: 19, cantidad: 2 }]
+                });
+
+            expect(respuesta.status).toBe(201);
+            expect(respuesta.body).toMatchObject({
+                id: 1,
+                mesa: 7,
+                items: [{ productoId: 19, cantidad: 2 }],
+                estado: 'pendiente',
+                total:5000
+            });
+
+            const repositorio = new SqlitePedidoRepository(db);
+            expect(repositorio.findById(1)).toMatchObject({
+                mesa: 7,
+                items: [{ productoId: 19, cantidad: 2 }],
+                estado: 'pendiente'
+            });
+        } finally {
+            db.close();
+        }
+    });
+    it('rechaza un pedido sin ítems y no guarda nada', async () => {
+        const db = createDb(':memory:');
+
+        try {
+            const respuesta = await request(makeApp(db))
+                .post('/pedidos')
+                .send({ mesa: 7, items: [] });
+
+            expect(respuesta.status).toBe(400);
+            expect(new SqlitePedidoRepository(db).findAll()).toEqual([]);
+        } finally {
+            db.close();
+        }
+    });
+    it('rechaza un producto inexistente y no guarda el pedido', async () => {
+        const db = createDb(':memory:');
+
+        try {
+            const respuesta = await request(makeApp(db))
+                .post('/pedidos')
+                .send({ items: [{ productoId: 999, cantidad: 1 }] });
+
+            expect(respuesta.status).toBe(400);
+            expect(new SqlitePedidoRepository(db).findAll()).toEqual([]);
         } finally {
             db.close();
         }

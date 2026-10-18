@@ -12,10 +12,10 @@ export function makeApp(db: Database.Database) {
     app.use(express.json());
     const productoRepo = new SqliteProductoRepository(db);
 
-  
+
     const productoService = new ProductoServiceImpl(productoRepo);
     const repositorio = new SqlitePedidoRepository(db);
-    const servicio = new PedidoService(repositorio);
+    const servicio = new PedidoService(repositorio, productoService);
 
     app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
