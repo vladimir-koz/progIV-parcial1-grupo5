@@ -162,17 +162,3 @@ curl http://localhost:3000/reportes/mas-vendido
   Se incluyen casos de error (400 y 404).
 - **E2E** (`e2e/`): un flujo completo (consultar catálogo, crear un pedido y
   ver los reportes) y un caso de error.
-
-## CI (GitHub Actions)
-
-`.github/workflows/ci.yml` corre en cada `push` y en cada Pull Request:
-
-1. Chequea los tipos.
-2. Corre `npm test` con cobertura.
-3. Corre los tests E2E.
-
-## Nota sobre `better-sqlite3`
-
-Se usa la versión 12 en lugar de la 11 del starter. La API es la misma, pero
-la 11 no publica binarios precompilados para Node 24 y en Windows exige
-compilarla con Visual Studio.
