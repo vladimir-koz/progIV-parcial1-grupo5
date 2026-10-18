@@ -24,5 +24,25 @@ export function makeApp(db: Database.Database) {
     app.use('/productos', makeProductosRouter(productoService));
     app.use('/pedidos', makePedidosRouter(pedidoService));
 
+    if (process.env.NODE_ENV === 'test') {
+    app.post('/__test__/reset', (_req, res) => {
+      pedidoRepo.clear();
+      res.sendStatus(204);
+    });
+
+    app.post('/__test__/seed', (_req, res) => {
+      const a = pedidoService.crearPedido({
+        items: [
+          { productoId: 2, cantidad: 2 }, // Expreso Pocillo Colombia
+          { productoId: 19, cantidad: 1 } // Muffin de chocolate
+        ]
+      });
+      const b = pedidoService.crearPedido({
+        items: [{ productoId: 2, cantidad: 1 }],
+        mesa: 7
+      });
+      res.status(201).json({ created: [a, b] });
+    });
+  }
     return app;
 }
