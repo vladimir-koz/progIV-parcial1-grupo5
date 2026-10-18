@@ -66,7 +66,10 @@ describe('GET /pedidos', () => {
             const respuesta = await request(makeApp(db)).get('/pedidos');
 
             expect(respuesta.status).toBe(200);
-            expect(respuesta.body).toMatchObject([primero, segundo]);
+            expect(respuesta.body).toMatchObject([
+                { ...primero, total: 2500 },
+                { ...segundo, total: 5000 }
+            ]);
         } finally {
             db.close();
         }
@@ -87,7 +90,7 @@ describe('GET /pedidos/:id', () => {
                 .get(`/pedidos/${creado.id}`);
 
             expect(respuesta.status).toBe(200);
-            expect(respuesta.body).toMatchObject(creado);
+            expect(respuesta.body).toMatchObject({ ...creado, total: 5000 });
         } finally {
             db.close();
         }
