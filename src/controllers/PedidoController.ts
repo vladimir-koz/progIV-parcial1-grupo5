@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { PedidoService } from '../services/PedidoService';
+import { PedidoService, ProductoInexistenteError } from '../services/PedidoService';
 import { z } from 'zod';
 
 const crearPedidoSchema = z.object({
@@ -52,7 +52,7 @@ export class PedidoController {
 
         res.json(pedido);
     };
-    crear = (req: Request, res: Response): void => {
+    crear = (req: Request, res: Response) => {
         const validacion = crearPedidoSchema.safeParse(req.body);
 
         if (!validacion.success) {
@@ -60,11 +60,14 @@ export class PedidoController {
             return;
         }
 
-        const pedido = this.servicio.crearPedido(validacion.data);
-        if (pedido === undefined) {
-            res.status(400).json({ error: 'DatosInvalidos' });
-            return;
+        try {
+            const pedido = this.servicio.crearPedido(validacion.data);
+            res.status(201).json(pedido);
+        } catch (e) {
+            if (e instanceof ProductoInexistenteError) {
+                return res.status(400).json({ error: 'ProductoInexistente', productoId: e.productoId });
+            }
+            throw e;
         }
-        res.status(201).json(pedido);
     };
 }

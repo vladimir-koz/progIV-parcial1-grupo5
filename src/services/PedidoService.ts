@@ -2,6 +2,12 @@ import type { ItemPedido, NuevoPedido, Pedido } from '../models/Pedido';
 import { SqlitePedidoRepository } from '../repositories/PedidoRepository';
 import type { ProductoService } from './ProductoService';
 
+export class ProductoInexistenteError extends Error {
+  constructor(readonly productoId: number) {
+    super(`No existe el producto con id ${productoId}`);
+    this.name = 'ProductoInexistenteError';
+  }
+}
 export class PedidoService {
     constructor(
         private readonly pedidos: SqlitePedidoRepository,
@@ -18,6 +24,12 @@ export class PedidoService {
     }
 
     crearPedido(nuevo: NuevoPedido): (Pedido & { total: number }) | undefined {
+        // Se valida todo antes de guardar, para no dejar pedidos a medias.
+        for (const item of nuevo.items) {
+        if (!this.productos.obtenerProducto(item.productoId)) {
+            throw new ProductoInexistenteError(item.productoId);
+        }
+        }
         const total = this.calcularTotal(nuevo.items);
         if (total === undefined) return undefined;
 

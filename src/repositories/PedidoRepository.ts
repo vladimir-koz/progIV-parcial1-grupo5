@@ -85,4 +85,8 @@ export class SqlitePedidoRepository {
             items: buscarItems.all(fila.id) as ItemPedido[]
         }));
     }
+
+    clear(): void {
+        this.db.exec(`DELETE FROM pedido_items; DELETE FROM pedidos;`);
+    }
 }
