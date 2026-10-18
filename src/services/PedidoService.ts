@@ -11,14 +11,14 @@ export class PedidoService {
     obtenerPedido(id: number): Pedido | undefined {
         return this.pedidos.findById(id);
     }
-    crearPedido(nuevo: NuevoPedido): Pedido & { total: number } {
-        const total = nuevo.items.reduce((suma, item) => {
+        crearPedido(nuevo: NuevoPedido): (Pedido & { total: number }) | undefined {
+        let total = 0;
+
+        for (const item of nuevo.items) {
             const producto = this.productos.obtenerProducto(item.productoId);
-            if (producto === undefined) {
-                throw new Error('Producto inexistente');
-            }
-            return suma + producto.calcularPrecio() * item.cantidad;
-        }, 0);
+            if (producto === undefined) return undefined;
+            total += producto.calcularPrecio() * item.cantidad;
+        }
 
         const pedido = this.pedidos.create(nuevo);
         return { ...pedido, total };

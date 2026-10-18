@@ -61,6 +61,10 @@ export class PedidoController {
         }
 
         const pedido = this.servicio.crearPedido(validacion.data);
+        if (pedido === undefined) {
+            res.status(400).json({ error: 'DatosInvalidos' });
+            return;
+        }
         res.status(201).json(pedido);
     };
 }
